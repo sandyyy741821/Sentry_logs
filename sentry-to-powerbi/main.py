@@ -7,12 +7,11 @@ import time
 # --- CONFIG ---
 SENTRY_TOKEN = os.environ["SENTRY_TOKEN"]
 
-ISSUE_API_URL = os.environ.get("ISSUE_API_URL", "")
-EVENT_API_URL = os.environ.get("EVENT_API_URL", "")
+ISSUE_API_URL = os.environ["ISSUE_API_URL"]
+EVENT_API_URL = os.environ["EVENT_API_URL"]
 
-POWER_BI_ISSUE_URL = os.environ.get("POWER_BI_ISSUE_URL", "")
-POWER_BI_EVENT_URL = os.environ.get("POWER_BI_EVENT_URL", "")
-
+POWER_BI_ISSUE_URL = os.environ["POWER_BI_ISSUE_URL"]
+POWER_BI_EVENT_URL = os.environ["POWER_BI_EVENT_URL"]
 ISSUE_CHECKPOINT_FILE = os.path.join(os.path.dirname(__file__), "last_issues_time.txt")
 EVENT_CHECKPOINT_FILE = os.path.join(os.path.dirname(__file__), "last_events_time.txt")
 
