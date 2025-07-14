@@ -1,0 +1,40 @@
+name: Sentry to PowerBI Every 3 Mins
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "*/5 * * * *"  
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code with GH_PAT
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Sentry to PowerBI script
+        env:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+          POWER_BI_ISSUE_URL: ${{ secrets.POWER_BI_ISSUE_URL }}
+          POWER_BI_EVENT_URL: ${{ secrets.POWER_BI_EVENT_URL }}
+        run: python sentry-to-powerbi/main.py
+
+      - name: Commit and push updated checkpoints
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Sentry-logs/sentry-to-powerbi/last_issues_time.txt
+          git add Sentry-logs/sentry-to-powerbi/last_events_time.txt
+          git commit -m "Update Sentry checkpoint files" || echo "No changes to commit"
+          git push origin HEAD:main
