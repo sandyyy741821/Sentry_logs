@@ -32,7 +32,8 @@ def load_last_processed_time(filename):
     if os.path.exists(filename):
         with open(filename, "r") as f:
             try:
-                return int(f.read().strip().split()[0])
+                line = f.read().strip()
+                return int(line.split()[0])
             except:
                 pass
     default_start = datetime(2025, 4, 18, 0, 0, tzinfo=timezone.utc)
