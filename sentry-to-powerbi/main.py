@@ -5,15 +5,13 @@ from datetime import datetime, timezone, timedelta
 import time
 
 # --- CONFIG ---
-SENTRY_TOKEN = "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"
-ORG_SLUG = "gravity-ai"
-PROJECT_SLUG = "my-first-project"
+SENTRY_TOKEN = os.environ["SENTRY_TOKEN"]
 
-ISSUE_API_URL = f"https://sentry.io/api/0/projects/{ORG_SLUG}/{PROJECT_SLUG}/issues/"
-EVENT_API_URL = f"https://sentry.io/api/0/projects/{ORG_SLUG}/{PROJECT_SLUG}/events/"
+ISSUE_API_URL = os.environ.get("ISSUE_API_URL", "")
+EVENT_API_URL = os.environ.get("EVENT_API_URL", "")
 
-POWER_BI_ISSUE_URL = "https://api.powerbi.com/beta/4a2ebf79-c54a-4ae4-a274-2f55027091ce/datasets/123c7016-2fa4-450d-9551-1fbf1931df81/rows?experience=power-bi&subfolderId=37842&key=nW9sKYUPTqspdQFJo6m6Cd1JjOoXJn1%2BSjl4d%2BVur4vcA9Tb1YOyHkSQp%2F8jI5%2BL5mDtfywAeV4MJ5YNDRnGmg%3D%3D"
-POWER_BI_EVENT_URL = "https://api.powerbi.com/beta/4a2ebf79-c54a-4ae4-a274-2f55027091ce/datasets/c241dee8-30a4-4bfa-a992-98dfd2237536/rows?experience=power-bi&key=m9W2kB3NDbNu0pVZbhePAHGx1MiRdVPl1%2FZl3MlhWxhTmdyD0SLHmrm7qAqVgcVVT3wWgq5iMvSo2bOrzkPtEg%3D%3D"
+POWER_BI_ISSUE_URL = os.environ.get("POWER_BI_ISSUE_URL", "")
+POWER_BI_EVENT_URL = os.environ.get("POWER_BI_EVENT_URL", "")
 
 ISSUE_CHECKPOINT_FILE = os.path.join(os.path.dirname(__file__), "last_issues_time.txt")
 EVENT_CHECKPOINT_FILE = os.path.join(os.path.dirname(__file__), "last_events_time.txt")
