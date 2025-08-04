@@ -28,6 +28,8 @@ jobs:
           SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
           POWER_BI_ISSUE_URL: ${{ secrets.POWER_BI_ISSUE_URL }}
           POWER_BI_EVENT_URL: ${{ secrets.POWER_BI_EVENT_URL }}
+          ISSUE_API_URL: ${{ secrets.ISSUE_API_URL }}
+          EVENT_API_URL: ${{ secrets.EVENT_API_URL }}
         run: python sentry-to-powerbi/main.py
 
       - name: Commit and push updated checkpoints
