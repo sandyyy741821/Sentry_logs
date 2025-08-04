@@ -5,17 +5,24 @@ from datetime import datetime, timezone, timedelta
 import time
 
 # --- CONFIG ---
-SENTRY_TOKEN = os.environ["SENTRY_TOKEN"]
+# SENTRY_TOKEN = os.environ["SENTRY_TOKEN"]
 
-ISSUE_API_URL = os.environ.get("ISSUE_API_URL", "")
-EVENT_API_URL = os.environ.get("EVENT_API_URL", "")
+# ISSUE_API_URL = os.environ.get("ISSUE_API_URL", "")
+# EVENT_API_URL = os.environ.get("EVENT_API_URL", "")
 
-POWER_BI_ISSUE_URL = os.environ["POWER_BI_ISSUE_URL"]
-POWER_BI_EVENT_URL = os.environ["POWER_BI_EVENT_URL"]
+# POWER_BI_ISSUE_URL = os.environ["POWER_BI_ISSUE_URL"]
+# POWER_BI_EVENT_URL = os.environ["POWER_BI_EVENT_URL"]
+
+SENTRY_TOKEN = "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"
+ISSUE_API_URL = "https://sentry.io/api/0/projects/gravity-ai/my-first-project/issues/"
+EVENT_API_URL = "https://sentry.io/api/0/projects/gravity-ai/my-first-project/events/"
+POWER_BI_ISSUE_URL = "https://api.powerbi.com/beta/4a2ebf79-c54a-4ae4-a274-2f55027091ce/datasets/123c7016-2fa4-450d-9551-1fbf1931df81/rows?experience=power-bi&key=nW9sKYUPTqspdQFJo6m6Cd1JjOoXJn1%2BSjl4d%2BVur4vcA9Tb1YOyHkSQp%2F8jI5%2BL5mDtfywAeV4MJ5YNDRnGmg%3D%3D"
+POWER_BI_EVENT_URL = "https://api.powerbi.com/beta/4a2ebf79-c54a-4ae4-a274-2f55027091ce/datasets/27b634a2-615a-4020-b4ea-43ae0792d92a/rows?experience=power-bi&key=Faaw%2BgYpmLsYH76CkVAssDj36rcuqnERMeDCB9ktToY6jTcHYG%2B8tPKp7c9feeQzePdMn%2BOiyV5XnCg7iNnQiA%3D%3D"
+
 ISSUE_CHECKPOINT_FILE = os.path.join(os.path.dirname(__file__), "last_issues_time.txt")
 EVENT_CHECKPOINT_FILE = os.path.join(os.path.dirname(__file__), "last_events_time.txt")
 
-BATCH_SIZE = 10
+BATCH_SIZE = 100
 
 def convert_to_ist(dt_str):
     utc = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
@@ -134,18 +141,20 @@ def transform_issues(issues):
         stats_list = issue.get("stats", {}).get("24h", [])
         stats_breakdown = [f"{unix_to_ist(ts)}: {count}" for ts, count in stats_list if count > 0]
         result.append({
-            "id": issue.get("id"),
-            "title": issue.get("title"),
-            "culprit": issue.get("culprit"),
-            "level": issue.get("level"),
-            "platform": issue.get("platform"),
-            "count": issue.get("count"),
-            "priority": issue.get("priority"),
-            "first_seen": convert_to_ist(issue.get("firstSeen")),
-            "last_seen": convert_to_ist(issue.get("lastSeen")),
-            "permalink": issue.get("permalink"),
-            "stats": "\n".join(stats_breakdown),
-            "status": issue.get("status")
+            "id": issue.get("id", ""),
+            "title": issue.get("title", ""),
+            "endpoint": issue.get("culprit", ""),
+            "level": issue.get("level", ""),
+            "platform": issue.get("platform", ""),
+            "count": issue.get("count", 0),
+            "priority": issue.get("priority", ""),
+            "first_seen_ist": convert_to_ist(issue.get("firstSeen", "")),
+            "last_seen_ist": convert_to_ist(issue.get("lastSeen", "")),
+            "first_seen_utc": issue.get("firstSeen", ""),
+            "last_seen_utc": issue.get("lastSeen", ""),
+            "permalink": issue.get("permalink", ""),
+            "stats": "\n".join(stats_breakdown) if stats_breakdown else "",
+            "status": issue.get("status", ""),
         })
     return result
 
@@ -158,22 +167,23 @@ def transform_events(events):
         if message and len(message) > 3990:
             message = message[:3990] + "..." 
         result.append({
-            "primary_id": event.get("id"),
-            "event_type": event.get("event.type"),
-            "groupID": event.get("groupID"),
+            "primary_id": event.get("id", ""),
+            "event_type": event.get("event.type", ""),
+            "groupID": event.get("groupID", ""),
             "message": message,
-            "location": event.get("location"),
-            "culprit": event.get("culprit"),
-            "title": event.get("title"),
+            "location": event.get("location", ""),
+            "endpoint": event.get("culprit", ""),
+            "title": event.get("title", ""),
             "user_id": user.get("id"),
-            "role": (user.get("data") or {}).get("role"),
-            "url": tags.get("url"),
-            "level": tags.get("level"),
-            "environment": tags.get("environment"),
-            "created_time": event.get("dateCreated"),
-            "platform": event.get("platform"),
-            "filename": event.get("metadata", {}).get("filename"),
-            "function_name": event.get("metadata", {}).get("function")
+            "role": (user.get("data") or {}).get("role", ""),
+            "url": tags.get("url"," "),
+            "level": tags.get("level", ""),
+            "environment": tags.get("environment", ""),
+            "created_time_ist": convert_to_ist(event.get("dateCreated",0)),
+            "created_time_utc": event.get("dateCreated", ""),
+            "platform": event.get("platform", ""),
+            "filename": event.get("metadata", {}).get("filename", ""),
+            "function_name": event.get("metadata", {}).get("function", "")
         })
     return result
 
@@ -232,7 +242,7 @@ if __name__ == "__main__":
     print(f"New events to push: {len(new_events)}")
 
     if new_events:
-        print("Sample event:\n", json.dumps(new_events[0], indent=2))
+        # print("Sample event:\n", json.dumps(new_events[0], indent=2))
         new_events.sort(key=get_event_time)
         transformed_events = transform_events(new_events)
         if push_to_powerbi_in_batches(transformed_events, POWER_BI_EVENT_URL):

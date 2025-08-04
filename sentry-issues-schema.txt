@@ -1,0 +1,15 @@
+
+id
+title
+culprit
+level
+platform
+count
+priority
+permalink
+stats
+status
+first_seen_utc
+last_seen_utc 
+first_seen_ist 
+last_seen_ist

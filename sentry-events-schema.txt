@@ -1,0 +1,17 @@
+primary_id
+user_id
+event_type
+groupID
+message
+location
+culprit
+title
+role
+url
+level
+environment
+platform
+filename
+function_name
+created_time_utc
+created_time_ist
